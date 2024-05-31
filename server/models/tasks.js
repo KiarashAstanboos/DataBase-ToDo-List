@@ -13,7 +13,11 @@ const TaskSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  status: {
+    type: Number,
+    required: true,
+  },
 });
 
-const TaskModel = mongoose.model("Tasks", TaskSchema);
+const TaskModel = mongoose.model("Task", TaskSchema, "Tasks");
 module.exports = TaskModel;
