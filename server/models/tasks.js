@@ -7,15 +7,15 @@ const TaskSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true,
+    required: false,
   },
   priority: {
     type: Number,
-    required: true,
+    required: false,
   },
   status: {
-    type: Number,
-    required: true,
+    type: Boolean,
+    default: false,
   },
 });
 

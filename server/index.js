@@ -41,6 +41,35 @@ app.post("/createTask", async (req, res) => {
   }
 });
 
+app.put("/editTask/:id", async (req, res) => {
+  try {
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        title: req.body.title,
+        description: req.body.description,
+        priority: req.body.priority,
+        status: req.body.status,
+      },
+      { new: true } // Return the updated document
+    );
+    res.json(updatedTask);
+  } catch (err) {
+    console.error("Error updating task:", err);
+    res.status(500).json(err);
+  }
+});
+
+app.delete("/deleteTask/:id", async (req, res) => {
+  try {
+    await TaskModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Task deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting task:", err);
+    res.status(500).json(err);
+  }
+});
+
 app.listen(port, () => { 
   console.log("Server is running at port " + port);
 });
