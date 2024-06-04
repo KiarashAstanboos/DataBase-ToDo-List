@@ -11,24 +11,26 @@ body {
   border: 1px solid #00000000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  padding: 20px;
 }
 
 .tasksDisplay {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-gap: 20px;
 }
 
 .tasksDisplay > div {
+  background-color: #99a8bb  ;
   margin: 20px;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 10px;
   width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tasksDisplay > div > h1 {
+  font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
 }
@@ -40,39 +42,54 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-right: 10px;
 }
 
 .tasksDisplay > div > button:hover {
   background-color: #3e8e41;
 }
 
-.createTask {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.createTaskContainer {
+  background-color: #99a8bb;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  width: 300px;
+  border: 2px solid #ddd;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.createTask > input[type="text"],
-.createTask > input[type="number"] {
+.createTaskContainer > input[type="text"],
+.createTaskContainer > input[type="number"] {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 97%;
 }
 
-.createTask > button {
+.createTaskContainer > button {
   background-color: #4CAF50;
   color: #fff;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-left: 350px;
 }
 
-.createTask > button:hover {
+.createTaskContainer > button:hover {
   background-color: #3e8e41;
+}
+
+header {
+  font-size: 2rem;
+  color: #000000;
+}
+
+header,
+form {
+  min-height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

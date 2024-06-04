@@ -27,12 +27,10 @@ function App() {
       priority,
       status,
     }).then((response) => {
-      setListOfTasks([
-        ...listOfTasks,
-        response.data,
-      ]);
+      setListOfTasks([...listOfTasks, response.data]);
     });
   };
+
 
   const editTask = (id) => {
     Axios.put(`http://localhost:3000/editTask/${id}`, {
@@ -41,7 +39,9 @@ function App() {
       priority: editPriority,
       status: editStatus,
     }).then((response) => {
-      setListOfTasks(listOfTasks.map(task => task._id === id ? response.data : task));
+      setListOfTasks(
+        listOfTasks.map((task) => (task._id === id ? response.data : task))
+      );
       setEditId(null);
     });
   };
@@ -54,6 +54,42 @@ function App() {
 
   return (
     <div className="App">
+      <header>
+        <h1>Todo List</h1>
+      </header>
+
+      <div className="createTaskContainer">
+        <input
+          type="text"
+          placeholder="Title..."
+          onChange={(event) => {
+            setTitle(event.target.value);
+          }}
+        />
+        <input
+          type="text"
+          placeholder="Description..."
+          onChange={(event) => {
+            setDescription(event.target.value);
+          }}
+        />
+        <input
+          type="number"
+          placeholder="Priority..."
+          onChange={(event) => {
+            setPriority(event.target.value);
+          }}
+        />
+        <input
+          type="number"
+          placeholder="Status..."
+          onChange={(event) => {
+            setStatus(event.target.value);
+          }}
+        />
+        <button onClick={createTask}> Create Task </button>
+      </div>
+
       <div className="tasksDisplay">
         {listOfTasks.map((task) => {
           return (
@@ -91,14 +127,16 @@ function App() {
                   <h1>Title: {task.title}</h1>
                   <h1>Description: {task.description}</h1>
                   <h1>Priority: {task.priority}</h1>
-                  <h1>Status: {task.status}</h1>
-                  <button onClick={() => {
-                    setEditId(task._id);
-                    setEditTitle(task.title);
-                    setEditDescription(task.description);
-                    setEditPriority(task.priority);
-                    setEditStatus(task.status);
-                  }}>Edit</button>
+                  <h1>Status: {task.status ? 'Completed' : 'Pending'}</h1>
+                  <button
+                    onClick={() => {
+                      setEditId(task._id);
+                      setEditTitle(task.title);
+                      setEditDescription(task.description);
+                      setEditPriority(task.priority);
+                      setEditStatus(task.status);
+                    }}>Edit</button>
+
                   <button onClick={() => deleteTask(task._id)}>Delete</button>
                 </div>
               )}
@@ -106,38 +144,7 @@ function App() {
           );
         })}
       </div>
-
-      <div>
-        <input
-          type="text"
-          placeholder="Title..."
-          onChange={(event) => {
-            setTitle(event.target.value);
-          }}
-        />
-        <input
-          type="text"
-          placeholder="Description..."
-          onChange={(event) => {
-            setDescription(event.target.value);
-          }}
-        />
-        <input
-          type="number"
-          placeholder="Priority..."
-          onChange={(event) => {
-            setPriority(event.target.value);
-          }}
-        />
-        <input
-          type="number"
-          placeholder="Status..."
-          onChange={(event) => {
-            setStatus(event.target.value);
-          }}
-        />
-        <button onClick={createTask}> Create Task </button>
-      </div>
+      
     </div>
   );
 }
