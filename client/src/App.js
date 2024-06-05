@@ -31,7 +31,6 @@ function App() {
     });
   };
 
-
   const editTask = (id) => {
     Axios.put(`http://localhost:3000/editTask/${id}`, {
       title: editTitle,
@@ -80,13 +79,6 @@ function App() {
             setPriority(event.target.value);
           }}
         />
-        <input
-          type="number"
-          placeholder="Status..."
-          onChange={(event) => {
-            setStatus(event.target.value);
-          }}
-        />
         <button onClick={createTask}> Create Task </button>
       </div>
 
@@ -127,24 +119,49 @@ function App() {
                   <h1>Title: {task.title}</h1>
                   <h1>Description: {task.description}</h1>
                   <h1>Priority: {task.priority}</h1>
-                  <h1>Status: {task.status ? 'Completed' : 'Pending'}</h1>
-                  <button
-                    onClick={() => {
-                      setEditId(task._id);
-                      setEditTitle(task.title);
-                      setEditDescription(task.description);
-                      setEditPriority(task.priority);
-                      setEditStatus(task.status);
-                    }}>Edit</button>
+                  <h1>Status: {task.status ? "Completed" : "Pending"}</h1>
 
-                  <button onClick={() => deleteTask(task._id)}>Delete</button>
+                  <div className="task-actions">
+                    <button
+                      className="edit-button"
+                      onClick={() => {
+                        setEditId(task._id);
+                        setEditTitle(task.title);
+                        setEditDescription(task.description);
+                        setEditPriority(task.priority);
+                        setEditStatus(task.status);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="delete-button"
+                      onClick={() => deleteTask(task._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+
+                  <input
+                    type="checkbox"
+                    className="task-status-checkbox"
+                    checked={task.status}
+                    onChange={(event) => {
+                      const updatedTasks = listOfTasks.map((task) => {
+                        if (task._id === task._id) {
+                          return { ...task, status: event.target.checked };
+                        }
+                        return task;
+                      });
+                      setListOfTasks(updatedTasks);
+                    }}
+                  />
                 </div>
               )}
             </div>
           );
         })}
       </div>
-      
     </div>
   );
 }
