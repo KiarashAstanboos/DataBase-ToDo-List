@@ -32,6 +32,7 @@ app.post("/createTask", async (req, res) => {
       description: req.body.description,
       priority: req.body.priority,
       status: req.body.status,
+      dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
     });
     const savedTask = await newTask.save();
     res.status(201).json(savedTask);
@@ -50,6 +51,7 @@ app.put("/editTask/:id", async (req, res) => {
         description: req.body.description,
         priority: req.body.priority,
         status: req.body.status,
+        dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
       },
       { new: true } // Return the updated document
     );

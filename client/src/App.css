@@ -19,34 +19,60 @@ body {
   grid-gap: 20px;
 }
 
-.tasksDisplay > div {
-  background-color: #99a8bb;
-  margin: 20px;
+.task {
+  background-color: #d3d3d3;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 10px;
-  width: 300px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.tasksDisplay > div > h1 {
-  font-size: 18px;
+.task.completed {
+  background-color: #99a8bb;
+  text-decoration: line-through;
+}
+
+.task h1 {
+  font-size: 16px;
   font-weight: bold;
   margin-bottom: 10px;
 }
 
-.tasksDisplay > div > button {
+.task p {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.task .task-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.task .task-actions button {
   background-color: #4caf50;
   color: #fff;
-  padding: 10px 20px;
+  padding: 5px 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-right: 10px;
 }
 
-.tasksDisplay > div > button:hover {
+.task .task-actions button:hover {
   background-color: #3e8e41;
+}
+
+.task .task-actions .delete-button {
+  background-color: #f44336;
+}
+
+.task .task-actions .delete-button:hover {
+  background-color: #c62828;
 }
 
 .createTaskContainer {
@@ -56,42 +82,59 @@ body {
   border-radius: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.createTaskContainer > input[type="text"],
-.createTaskContainer > input[type="number"] {
+.createTaskContainer input[type="text"],
+.createTaskContainer input[type="number"] {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 97%;
+  width: 80%;
 }
 
-.createTaskContainer > button {
+.createTaskContainer button {
   background-color: #4caf50;
   color: #fff;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 320px;
+  margin-top: 10px;
 }
 
-.createTaskContainer > button:hover {
+.createTaskContainer button:hover {
   background-color: #3e8e41;
 }
 
 header {
   font-size: 2rem;
   color: #000000;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-header,
-form {
-  min-height: 20vh;
+.sortButtons {
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sortButtons button {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+sortButtons button:hover {
+  background-color: #3e8e41;
 }
 
 .task-status-checkbox {
@@ -100,7 +143,7 @@ form {
   -moz-appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid #ccc;
+  border: 2px solid #4caf50;
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -121,33 +164,4 @@ form {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
-
-.task-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.edit-button,
-.delete-button {
-  background-color: #4caf50;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin: 0 5px;
-}
-
-.edit-button:hover {
-  background-color: #3e8e41;
-}
-
-.delete-button {
-  background-color: #f44336;
-}
-
-.delete-button:hover {
-  background-color: #c62828;
 }
