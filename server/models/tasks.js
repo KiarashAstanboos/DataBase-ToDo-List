@@ -21,6 +21,11 @@ const TaskSchema = new mongoose.Schema({
     type: Date,
     required: false,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 const TaskModel = mongoose.model("Task", TaskSchema, "Tasks");

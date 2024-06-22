@@ -1,5 +1,3 @@
-// App.js
-
 import "./App.css";
 import { useState, useEffect } from "react";
 import Axios from "axios";
@@ -9,29 +7,77 @@ function App() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState(3);
-  const [dueDate, setDueDate] = useState(""); // Changed from days to dueDate
+  const [dueDate, setDueDate] = useState("");
   const [editId, setEditId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editPriority, setEditPriority] = useState(3);
   const [editDueDate, setEditDueDate] = useState("");
   const [sortType, setSortType] = useState("priority");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState("");
 
   useEffect(() => {
-    Axios.get("http://localhost:3000/getTasks").then((response) => {
-      const sortedTasks = sortTasks(response.data, sortType);
-      setListOfTasks(sortedTasks);
+    if (isLoggedIn) {
+      Axios.get("http://localhost:3000/getTasks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((response) => {
+        const sortedTasks = sortTasks(response.data, sortType);
+        setListOfTasks(sortedTasks);
+      });
+    }
+  }, [sortType, isLoggedIn, token]);
+
+  const register = () => {
+    Axios.post("http://localhost:3000/register", {
+      username,
+      password,
+    }).then((response) => {
+      setToken(response.data.token);
+      setIsLoggedIn(true);
+      setUsername("");
+      setPassword("");
     });
-  }, [sortType]);
+  };
+
+  const login = () => {
+    Axios.post("http://localhost:3000/login", {
+      username,
+      password,
+    }).then((response) => {
+      setToken(response.data.token);
+      setIsLoggedIn(true);
+      setUsername("");
+      setPassword("");
+    });
+  };
+
+  const logout = () => {
+    setToken("");
+    setIsLoggedIn(false);
+    setListOfTasks([]);
+  };
 
   const createTask = () => {
-    Axios.post("http://localhost:3000/createTask", {
-      title,
-      description,
-      priority,
-      status: 0,
-      dueDate: dueDate || null, // Set to null if dueDate is empty
-    }).then((response) => {
+    Axios.post(
+      "http://localhost:3000/createTask",
+      {
+        title,
+        description,
+        priority,
+        status: 0,
+        dueDate: dueDate || null,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((response) => {
       const sortedTasks = sortTasks([...listOfTasks, response.data], sortType);
       setListOfTasks(sortedTasks);
       clearInputFields();
@@ -42,17 +88,25 @@ function App() {
     setTitle("");
     setDescription("");
     setPriority(3);
-    setDueDate(""); // Set dueDate to empty string
+    setDueDate("");
   };
 
   const editTask = (id) => {
-    Axios.put(`http://localhost:3000/editTask/${id}`, {
-      title: editTitle,
-      description: editDescription,
-      priority: editPriority,
-      status: 0,
-      dueDate: editDueDate || null, // Set to null if editDueDate is empty
-    }).then((response) => {
+    Axios.put(
+      `http://localhost:3000/editTask/${id}`,
+      {
+        title: editTitle,
+        description: editDescription,
+        priority: editPriority,
+        status: 0,
+        dueDate: editDueDate || null,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((response) => {
       const sortedTasks = sortTasks(
         listOfTasks.map((task) => (task._id === id ? response.data : task)),
         sortType
@@ -63,15 +117,27 @@ function App() {
   };
 
   const deleteTask = (id) => {
-    Axios.delete(`http://localhost:3000/deleteTask/${id}`).then(() => {
+    Axios.delete(`http://localhost:3000/deleteTask/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(() => {
       setListOfTasks(listOfTasks.filter((task) => task._id !== id));
     });
   };
 
   const updateTaskStatus = (id, status) => {
-    Axios.put(`http://localhost:3000/editTask/${id}`, {
-      status: status,
-    }).then((response) => {
+    Axios.put(
+      `http://localhost:3000/editTask/${id}`,
+      {
+        status: status,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((response) => {
       const sortedTasks = sortTasks(
         listOfTasks.map((task) => (task._id === id ? response.data : task)),
         sortType
@@ -96,10 +162,33 @@ function App() {
     return tasks;
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="auth-container">
+        <h1>Login / Register</h1>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <button onClick={register}>Register</button>
+        <button onClick={login}>Login</button>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <header>
         <h1>Todo List</h1>
+        <button onClick={logout}>Logout</button>
       </header>
 
       <div className="sortButtons">
@@ -173,7 +262,7 @@ function App() {
                   <h1>Title: {task.title}</h1>
                   <p>Description: {task.description}</p>
                   <p>Priority: {task.priority}</p>
-                  <p>Due Date: {new Date(task.dueDate).toLocaleDateString('en-US')}</p>
+                  <p>Due Date: {new Date(task.dueDate).toLocaleDateString("en-US")}</p>
 
                   <div className="task-actions">
                     <button
