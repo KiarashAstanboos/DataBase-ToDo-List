@@ -20,29 +20,45 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      Axios.get("http://localhost:3000/getTasks", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }).then((response) => {
+  const fetchTasksAndCompletion = () => {
+    Axios.get("http://localhost:3001/getTasks", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
         const sortedTasks = sortTasks(response.data, sortType);
         setListOfTasks(sortedTasks);
+      })
+      .catch((error) => {
+        console.error("Error fetching tasks:", error);
       });
 
-      Axios.get("http://localhost:3000/completionPercentage", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }).then((response) => {
+    Axios.get("http://localhost:3001/completionPercentage", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        console.log(
+          "Completion Percentage:",
+          response.data.completionPercentage
+        );
         setCompletionPercentage(response.data.completionPercentage);
+      })
+      .catch((error) => {
+        console.error("Error fetching completion percentage:", error);
       });
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchTasksAndCompletion();
     }
-  }, [sortType, isLoggedIn, token]);
+  }, [isLoggedIn, token, sortType]); // Added sortType dependency back
 
   const register = () => {
-    Axios.post("http://localhost:3000/register", {
+    Axios.post("http://localhost:3001/register", {
       username,
       password,
     }).then((response) => {
@@ -54,7 +70,7 @@ function App() {
   };
 
   const login = () => {
-    Axios.post("http://localhost:3000/login", {
+    Axios.post("http://localhost:3001/login", {
       username,
       password,
     }).then((response) => {
@@ -66,14 +82,13 @@ function App() {
   };
 
   const logout = () => {
-    setToken("");
     setIsLoggedIn(false);
-    setListOfTasks([]);
+    setToken("");
   };
 
   const createTask = () => {
     Axios.post(
-      "http://localhost:3000/createTask",
+      "http://localhost:3001/createTask",
       {
         title,
         description,
@@ -89,6 +104,7 @@ function App() {
     ).then((response) => {
       const sortedTasks = sortTasks([...listOfTasks, response.data], sortType);
       setListOfTasks(sortedTasks);
+      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
       clearInputFields();
     });
   };
@@ -102,7 +118,7 @@ function App() {
 
   const editTask = (id) => {
     Axios.put(
-      `http://localhost:3000/editTask/${id}`,
+      `http://localhost:3001/editTask/${id}`,
       {
         title: editTitle,
         description: editDescription,
@@ -121,23 +137,25 @@ function App() {
         sortType
       );
       setListOfTasks(sortedTasks);
+      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
       setEditId(null);
     });
   };
 
   const deleteTask = (id) => {
-    Axios.delete(`http://localhost:3000/deleteTask/${id}`, {
+    Axios.delete(`http://localhost:3001/deleteTask/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }).then(() => {
       setListOfTasks(listOfTasks.filter((task) => task._id !== id));
+      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
     });
   };
 
   const updateTaskStatus = (id, status) => {
     Axios.put(
-      `http://localhost:3000/editTask/${id}`,
+      `http://localhost:3001/editTask/${id}`,
       {
         status: status,
       },
@@ -152,6 +170,7 @@ function App() {
         sortType
       );
       setListOfTasks(sortedTasks);
+      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
     });
   };
 
@@ -200,12 +219,6 @@ function App() {
         <button onClick={logout}>Logout</button>
       </header>
 
-      <div className="progressBar">
-        <div className="progress" style={{ width: `${completionPercentage}%` }}>
-          {completionPercentage.toFixed(2)}%
-        </div>
-      </div>
-
       <div className="sortButtons">
         <button onClick={() => setSortType("priority")}>
           Sort by Priority
@@ -243,6 +256,17 @@ function App() {
         />
         <button onClick={createTask}>Create Task</button>
       </div>
+
+      <div className="progressBar">
+        <div className="progress" style={{ width: `${completionPercentage}%` }}>
+          {completionPercentage.toFixed(2)}%
+        </div>
+      </div>
+
+      {console.log(
+        "Rendering with Completion Percentage:",
+        completionPercentage
+      )}
 
       <div className="tasksDisplay">
         {listOfTasks.map((task) => {

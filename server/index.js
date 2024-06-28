@@ -9,7 +9,7 @@ const TaskModel = require("./models/tasks");
 const UserModel = require("./models/User");
 
 const url = "mongodb://localhost:27017/ToDo";
-const port = 3000;
+const port = 3001;
 const secret = "your_jwt_secret"; // Replace with your own secret
 
 app.use(cors());
@@ -108,7 +108,10 @@ app.post("/createTask", protect, async (req, res) => {
 app.get("/completionPercentage", protect, async (req, res) => {
   try {
     const totalTasks = await TaskModel.countDocuments({ user: req.user.id });
-    const completedTasks = await TaskModel.countDocuments({ user: req.user.id, status: true });
+    const completedTasks = await TaskModel.countDocuments({
+      user: req.user.id,
+      status: true,
+    });
 
     const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
     res.json({ completionPercentage: percentage });

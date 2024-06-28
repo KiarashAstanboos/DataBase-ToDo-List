@@ -170,6 +170,7 @@ sortButtons button:hover {
   border-radius: 10px;
   overflow: hidden;
   margin: 20px 0;
+  width: 100%;
 }
 
 .progress {
@@ -178,4 +179,5 @@ sortButtons button:hover {
   text-align: center;
   color: white;
   line-height: 20px; /* same as height to center the text */
+  transition: width 0.5s;
 }
