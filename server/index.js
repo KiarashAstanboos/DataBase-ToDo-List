@@ -96,6 +96,7 @@ app.post("/createTask", protect, async (req, res) => {
       status: req.body.status,
       dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
       user: req.user.id,
+      category: req.body.category,  
     });
     const savedTask = await newTask.save();
     res.status(201).json(savedTask);
@@ -131,6 +132,7 @@ app.put("/editTask/:id", protect, async (req, res) => {
         priority: req.body.priority,
         status: req.body.status,
         dueDate: req.body.dueDate ? new Date(req.body.dueDate) : null,
+        category: req.body.category,
       },
       { new: true }
     );

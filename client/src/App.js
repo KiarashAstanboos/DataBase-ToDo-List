@@ -7,6 +7,8 @@ function App() {
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [editCategory, setEditCategory] = useState("");
   const [priority, setPriority] = useState(3);
   const [dueDate, setDueDate] = useState("");
   const [editId, setEditId] = useState(null);
@@ -95,6 +97,7 @@ function App() {
         priority,
         status: 0,
         dueDate: dueDate || null,
+        category,
       },
       {
         headers: {
@@ -125,6 +128,7 @@ function App() {
         priority: editPriority,
         status: 0,
         dueDate: editDueDate || null,
+        category: editCategory,
       },
       {
         headers: {
@@ -236,6 +240,13 @@ function App() {
         />
         <input
           type="text"
+          placeholder="Category"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+        />
+
+        <input
+          type="text"
           placeholder="Description..."
           value={description}
           onChange={(event) => setDescription(event.target.value)}
@@ -282,6 +293,12 @@ function App() {
                     value={editTitle}
                     onChange={(event) => setEditTitle(event.target.value)}
                     placeholder="Edit Title..."
+                  />
+                  <input
+                    type="text"
+                    placeholder="Category"
+                    value={editCategory}
+                    onChange={(event) => setEditCategory(event.target.value)}
                   />
                   <input
                     type="text"

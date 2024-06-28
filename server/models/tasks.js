@@ -17,6 +17,7 @@ const TaskSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  
   dueDate: {
     type: Date,
     required: false,
@@ -25,7 +26,12 @@ const TaskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-  },//'completed' needed to be added for progress bar
+  },
+  category: {
+    type: String,
+    enum: ["Business", "Daily"],
+    required: true,
+  },
 });
 
 const TaskModel = mongoose.model("Task", TaskSchema, "Tasks");
