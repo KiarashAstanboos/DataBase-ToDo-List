@@ -15,12 +15,15 @@ const secret = "your_jwt_secret"; // Replace with your own secret
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Database connected"))
-  .catch(err => console.log("Database connection error:", err));
+  .catch((err) => console.log("Database connection error:", err));
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, username: user.username }, secret, { expiresIn: "1h" });
+  return jwt.sign({ id: user._id, username: user.username }, secret, {
+    expiresIn: "1h",
+  });
 };
 
 // Authentication middleware
@@ -61,7 +64,7 @@ app.post("/login", async (req, res) => {
   try {
     const user = await UserModel.findOne({ username });
 
-    if (user && await user.matchPassword(password)) {
+    if (user && (await user.matchPassword(password))) {
       const token = generateToken(user);
       res.json({ token });
     } else {
@@ -102,6 +105,19 @@ app.post("/createTask", protect, async (req, res) => {
   }
 });
 
+app.get("/completionPercentage", protect, async (req, res) => {
+  try {
+    const totalTasks = await TaskModel.countDocuments({ user: req.user.id });
+    const completedTasks = await TaskModel.countDocuments({ user: req.user.id, status: true });
+
+    const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+    res.json({ completionPercentage: percentage });
+  } catch (err) {
+    console.error("Error calculating completion percentage:", err);
+    res.status(500).json(err);
+  }
+});
+
 app.put("/editTask/:id", protect, async (req, res) => {
   try {
     const updatedTask = await TaskModel.findOneAndUpdate(
@@ -132,6 +148,6 @@ app.delete("/deleteTask/:id", protect, async (req, res) => {
   }
 });
 
-app.listen(port, () => { 
+app.listen(port, () => {
   console.log("Server is running at port " + port);
 });

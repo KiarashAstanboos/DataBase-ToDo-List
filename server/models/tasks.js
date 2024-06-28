@@ -25,7 +25,7 @@ const TaskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
-  },
+  },//'completed' needed to be added for progress bar
 });
 
 const TaskModel = mongoose.model("Task", TaskSchema, "Tasks");

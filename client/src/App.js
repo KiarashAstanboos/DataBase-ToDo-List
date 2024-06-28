@@ -4,6 +4,7 @@ import Axios from "axios";
 
 function App() {
   const [listOfTasks, setListOfTasks] = useState([]);
+  const [completionPercentage, setCompletionPercentage] = useState(0);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState(3);
@@ -28,6 +29,14 @@ function App() {
       }).then((response) => {
         const sortedTasks = sortTasks(response.data, sortType);
         setListOfTasks(sortedTasks);
+      });
+
+      Axios.get("http://localhost:3000/completionPercentage", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then((response) => {
+        setCompletionPercentage(response.data.completionPercentage);
       });
     }
   }, [sortType, isLoggedIn, token]);
@@ -191,8 +200,16 @@ function App() {
         <button onClick={logout}>Logout</button>
       </header>
 
+      <div className="progressBar">
+        <div className="progress" style={{ width: `${completionPercentage}%` }}>
+          {completionPercentage.toFixed(2)}%
+        </div>
+      </div>
+
       <div className="sortButtons">
-        <button onClick={() => setSortType("priority")}>Sort by Priority</button>
+        <button onClick={() => setSortType("priority")}>
+          Sort by Priority
+        </button>
         <button onClick={() => setSortType("status")}>Sort by Status</button>
         <button onClick={() => setSortType("dueDate")}>Sort by Due Date</button>
       </div>
@@ -214,7 +231,9 @@ function App() {
           type="number"
           placeholder="Priority..."
           value={priority}
-          onChange={(event) => handlePriorityChange(event.target.value, setPriority)}
+          onChange={(event) =>
+            handlePriorityChange(event.target.value, setPriority)
+          }
         />
         <input
           type="date"
@@ -228,7 +247,10 @@ function App() {
       <div className="tasksDisplay">
         {listOfTasks.map((task) => {
           return (
-            <div key={task._id} className={`task ${task.status ? "completed" : ""}`}>
+            <div
+              key={task._id}
+              className={`task ${task.status ? "completed" : ""}`}
+            >
               {editId === task._id ? (
                 <div>
                   <input
@@ -246,7 +268,9 @@ function App() {
                   <input
                     type="number"
                     value={editPriority}
-                    onChange={(event) => handlePriorityChange(event.target.value, setEditPriority)}
+                    onChange={(event) =>
+                      handlePriorityChange(event.target.value, setEditPriority)
+                    }
                     placeholder="Edit Priority..."
                   />
                   <input
@@ -262,7 +286,10 @@ function App() {
                   <h1>Title: {task.title}</h1>
                   <p>Description: {task.description}</p>
                   <p>Priority: {task.priority}</p>
-                  <p>Due Date: {new Date(task.dueDate).toLocaleDateString("en-US")}</p>
+                  <p>
+                    Due Date:{" "}
+                    {new Date(task.dueDate).toLocaleDateString("en-US")}
+                  </p>
 
                   <div className="task-actions">
                     <button
