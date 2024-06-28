@@ -152,6 +152,18 @@ app.delete("/deleteTask/:id", protect, async (req, res) => {
     res.status(500).json(err);
   }
 });
+app.get("/getTasks/:category", protect, async (req, res) => {
+  try {
+    const { category } = req.params;
+    const query = category === "All" ? { user: req.user.id } : { user: req.user.id, category };
+
+    const tasks = await TaskModel.find(query);
+    res.json(tasks);
+  } catch (err) {
+    console.error("Error retrieving tasks:", err);
+    res.status(500).json(err);
+  }
+});
 
 app.listen(port, () => {
   console.log("Server is running at port " + port);

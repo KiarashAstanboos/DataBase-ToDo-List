@@ -7,7 +7,7 @@ function App() {
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Daily"); // Default to "Daily"
   const [editCategory, setEditCategory] = useState("");
   const [priority, setPriority] = useState(3);
   const [dueDate, setDueDate] = useState("");
@@ -21,7 +21,9 @@ function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
+  const [filterType, setFilterType] = useState("All"); // Default to "All"
 
+  // Fetch tasks and completion percentage from backend
   const fetchTasksAndCompletion = () => {
     Axios.get("http://localhost:3001/getTasks", {
       headers: {
@@ -42,10 +44,6 @@ function App() {
       },
     })
       .then((response) => {
-        console.log(
-          "Completion Percentage:",
-          response.data.completionPercentage
-        );
         setCompletionPercentage(response.data.completionPercentage);
       })
       .catch((error) => {
@@ -57,8 +55,9 @@ function App() {
     if (isLoggedIn) {
       fetchTasksAndCompletion();
     }
-  }, [isLoggedIn, token, sortType]); // Added sortType dependency back
+  }, [isLoggedIn, token, sortType]); // Dependencies: isLoggedIn, token, sortType
 
+  // User registration
   const register = () => {
     Axios.post("http://localhost:3001/register", {
       username,
@@ -71,6 +70,7 @@ function App() {
     });
   };
 
+  // User login
   const login = () => {
     Axios.post("http://localhost:3001/login", {
       username,
@@ -83,11 +83,13 @@ function App() {
     });
   };
 
+  // User logout
   const logout = () => {
     setIsLoggedIn(false);
     setToken("");
   };
 
+  // Create a new task
   const createTask = () => {
     Axios.post(
       "http://localhost:3001/createTask",
@@ -107,11 +109,12 @@ function App() {
     ).then((response) => {
       const sortedTasks = sortTasks([...listOfTasks, response.data], sortType);
       setListOfTasks(sortedTasks);
-      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
+      fetchTasksAndCompletion(); // Fetch updated tasks and completion percentage
       clearInputFields();
     });
   };
 
+  // Clear input fields after creating a task
   const clearInputFields = () => {
     setTitle("");
     setDescription("");
@@ -119,6 +122,7 @@ function App() {
     setDueDate("");
   };
 
+  // Edit an existing task
   const editTask = (id) => {
     Axios.put(
       `http://localhost:3001/editTask/${id}`,
@@ -136,32 +140,36 @@ function App() {
         },
       }
     ).then((response) => {
-      const sortedTasks = sortTasks(
-        listOfTasks.map((task) => (task._id === id ? response.data : task)),
-        sortType
+      const updatedTasks = listOfTasks.map((task) =>
+        task._id === id ? response.data : task
       );
+      const sortedTasks = sortTasks(updatedTasks, sortType);
       setListOfTasks(sortedTasks);
-      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
-      setEditId(null);
+      fetchTasksAndCompletion(); // Fetch updated tasks and completion percentage
+      setEditId(null); // Clear edit mode
     });
   };
 
+  // Delete a task
   const deleteTask = (id) => {
     Axios.delete(`http://localhost:3001/deleteTask/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }).then(() => {
-      setListOfTasks(listOfTasks.filter((task) => task._id !== id));
-      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
+      const updatedTasks = listOfTasks.filter((task) => task._id !== id);
+      const sortedTasks = sortTasks(updatedTasks, sortType);
+      setListOfTasks(sortedTasks);
+      fetchTasksAndCompletion(); // Fetch updated tasks and completion percentage
     });
   };
 
+  // Update task status (completed or not)
   const updateTaskStatus = (id, status) => {
     Axios.put(
       `http://localhost:3001/editTask/${id}`,
       {
-        status: status,
+        status: status ? 1 : 0,
       },
       {
         headers: {
@@ -169,20 +177,22 @@ function App() {
         },
       }
     ).then((response) => {
-      const sortedTasks = sortTasks(
-        listOfTasks.map((task) => (task._id === id ? response.data : task)),
-        sortType
+      const updatedTasks = listOfTasks.map((task) =>
+        task._id === id ? response.data : task
       );
+      const sortedTasks = sortTasks(updatedTasks, sortType);
       setListOfTasks(sortedTasks);
-      fetchTasksAndCompletion(); // Fetch latest tasks and completion percentage
+      fetchTasksAndCompletion(); // Fetch updated tasks and completion percentage
     });
   };
 
+  // Handle priority change with validation
   const handlePriorityChange = (value, setPriorityFunc) => {
     const newValue = Math.max(1, Math.min(3, value));
     setPriorityFunc(newValue);
   };
 
+  // Sort tasks based on given criteria
   const sortTasks = (tasks, type) => {
     if (type === "priority") {
       return tasks.sort((a, b) => a.priority - b.priority);
@@ -194,6 +204,7 @@ function App() {
     return tasks;
   };
 
+  // Render login/register form if not logged in
   if (!isLoggedIn) {
     return (
       <div className="auth-container">
@@ -216,6 +227,7 @@ function App() {
     );
   }
 
+  // Render main application when logged in
   return (
     <div className="App">
       <header>
@@ -224,9 +236,7 @@ function App() {
       </header>
 
       <div className="sortButtons">
-        <button onClick={() => setSortType("priority")}>
-          Sort by Priority
-        </button>
+        <button onClick={() => setSortType("priority")}>Sort by Priority</button>
         <button onClick={() => setSortType("status")}>Sort by Status</button>
         <button onClick={() => setSortType("dueDate")}>Sort by Due Date</button>
       </div>
@@ -238,13 +248,13 @@ function App() {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
         />
-        <input
-          type="text"
-          placeholder="Category"
+        <select
           value={category}
           onChange={(event) => setCategory(event.target.value)}
-        />
-
+        >
+          <option value="Daily">Daily</option>
+          <option value="Business">Business</option>
+        </select>
         <input
           type="text"
           placeholder="Description..."
@@ -255,9 +265,7 @@ function App() {
           type="number"
           placeholder="Priority..."
           value={priority}
-          onChange={(event) =>
-            handlePriorityChange(event.target.value, setPriority)
-          }
+          onChange={(event) => handlePriorityChange(event.target.value, setPriority)}
         />
         <input
           type="date"
@@ -274,98 +282,80 @@ function App() {
         </div>
       </div>
 
-      {console.log(
-        "Rendering with Completion Percentage:",
-        completionPercentage
-      )}
-
       <div className="tasksDisplay">
-        {listOfTasks.map((task) => {
-          return (
-            <div
-              key={task._id}
-              className={`task ${task.status ? "completed" : ""}`}
-            >
-              {editId === task._id ? (
-                <div>
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(event) => setEditTitle(event.target.value)}
-                    placeholder="Edit Title..."
-                  />
-                  <input
-                    type="text"
-                    placeholder="Category"
-                    value={editCategory}
-                    onChange={(event) => setEditCategory(event.target.value)}
-                  />
-                  <input
-                    type="text"
-                    value={editDescription}
-                    onChange={(event) => setEditDescription(event.target.value)}
-                    placeholder="Edit Description..."
-                  />
-                  <input
-                    type="number"
-                    value={editPriority}
-                    onChange={(event) =>
-                      handlePriorityChange(event.target.value, setEditPriority)
-                    }
-                    placeholder="Edit Priority..."
-                  />
-                  <input
-                    type="date"
-                    value={editDueDate}
-                    onChange={(event) => setEditDueDate(event.target.value)}
-                    placeholder="Edit Due Date..."
-                  />
-                  <button onClick={() => editTask(task._id)}>Save</button>
-                </div>
-              ) : (
-                <div>
-                  <h1>Title: {task.title}</h1>
-                  <p>Description: {task.description}</p>
-                  <p>Priority: {task.priority}</p>
-                  <p>
-                    Due Date:{" "}
-                    {new Date(task.dueDate).toLocaleDateString("en-US")}
-                  </p>
+        {listOfTasks.map((task) => (
+          <div key={task._id} className={`task ${task.status ? "completed" : ""}`}>
+            {editId === task._id ? (
+              <div>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(event) => setEditTitle(event.target.value)}
+                  placeholder="Edit Title..."
+                />
+                <select
+                  value={editCategory}
+                  onChange={(event) => setEditCategory(event.target.value)}
+                >
+                  <option value="Daily">Daily</option>
+                  <option value="Business">Business</option>
+                </select>
+                <input
+                  type="text"
+                  value={editDescription}
+                  onChange={(event) => setEditDescription(event.target.value)}
+                  placeholder="Edit Description..."
+                />
+                <input
+                  type="number"
+                  value={editPriority}
+                  onChange={(event) => handlePriorityChange(event.target.value, setEditPriority)}
+                  placeholder="Edit Priority..."
+                />
+                <input
+                  type="date"
+                  value={editDueDate}
+                  onChange={(event) => setEditDueDate(event.target.value)}
+                  placeholder="Edit Due Date..."
+                />
+                <button onClick={() => editTask(task._id)}>Save</button>
+              </div>
+            ) : (
+              <div>
+                <h1>Title: {task.title}</h1>
+                <p>Description: {task.description}</p>
+                <p>Priority: {task.priority}</p>
+                <p>Category: {task.category}</p>
+                <p>Due Date: {new Date(task.dueDate).toLocaleDateString("en-US")}</p>
 
-                  <div className="task-actions">
-                    <button
-                      className="edit-button"
-                      onClick={() => {
-                        setEditId(task._id);
-                        setEditTitle(task.title);
-                        setEditDescription(task.description);
-                        setEditPriority(task.priority);
-                        setEditDueDate(task.dueDate);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="delete-button"
-                      onClick={() => deleteTask(task._id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-
-                  <input
-                    type="checkbox"
-                    className="task-status-checkbox"
-                    checked={task.status}
-                    onChange={(event) => {
-                      updateTaskStatus(task._id, event.target.checked);
-                    }}
-                  />
+                <div className="task-actions">
+                  <button className="edit-button" onClick={() => {
+                    setEditId(task._id);
+                    setEditTitle(task.title);
+                    setEditCategory(task.category);
+                    setEditDescription(task.description);
+                    setEditPriority(task.priority);
+                    setEditDueDate(task.dueDate);
+                  }}>
+                    Edit
+                  </button>
+                  <button className="delete-button" onClick={() => deleteTask(task._id)}>
+                    Delete
+                  </button>
                 </div>
-              )}
-            </div>
-          );
-        })}
+
+                <input
+                  type="checkbox"
+                  className="task-status-checkbox"
+                  checked={task.status}
+                  onChange={(event) => {
+                    updateTaskStatus(task._id, event.target.checked);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
