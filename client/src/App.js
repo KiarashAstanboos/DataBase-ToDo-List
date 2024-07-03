@@ -22,10 +22,11 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [filterType, setFilterType] = useState("All"); // Default to "All"
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   // Fetch tasks and completion percentage from backend
   const fetchTasksAndCompletion = () => {
-    Axios.get("http://localhost:3001/getTasks", {
+    Axios.get(`http://localhost:3001/getTasks/${selectedCategory}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -55,7 +56,7 @@ function App() {
     if (isLoggedIn) {
       fetchTasksAndCompletion();
     }
-  }, [isLoggedIn, token, sortType]); // Dependencies: isLoggedIn, token, sortType
+  }, [isLoggedIn, token, sortType, selectedCategory]); // Dependencies: isLoggedIn, token, sortType
 
   // User registration
   const register = () => {
@@ -236,9 +237,20 @@ function App() {
       </header>
 
       <div className="sortButtons">
-        <button onClick={() => setSortType("priority")}>Sort by Priority</button>
+        <button onClick={() => setSortType("priority")}>
+          Sort by Priority
+        </button>
         <button onClick={() => setSortType("status")}>Sort by Status</button>
         <button onClick={() => setSortType("dueDate")}>Sort by Due Date</button>
+      </div>
+
+      <div className="filterCategory">
+        <label>Filter by Category:</label>
+        <select onChange={(event) => setSelectedCategory(event.target.value)}>
+          <option value="All">All</option>
+          <option value="Daily">Daily</option>
+          <option value="Business">Business</option>
+        </select>
       </div>
 
       <div className="createTaskContainer">
@@ -248,13 +260,7 @@ function App() {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
         />
-        <select
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
-        >
-          <option value="Daily">Daily</option>
-          <option value="Business">Business</option>
-        </select>
+
         <input
           type="text"
           placeholder="Description..."
@@ -265,8 +271,17 @@ function App() {
           type="number"
           placeholder="Priority..."
           value={priority}
-          onChange={(event) => handlePriorityChange(event.target.value, setPriority)}
+          onChange={(event) =>
+            handlePriorityChange(event.target.value, setPriority)
+          }
         />
+        <select
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
+        >
+          <option value="Daily">Daily</option>
+          <option value="Business">Business</option>
+        </select>
         <input
           type="date"
           placeholder="Due Date..."
@@ -284,7 +299,10 @@ function App() {
 
       <div className="tasksDisplay">
         {listOfTasks.map((task) => (
-          <div key={task._id} className={`task ${task.status ? "completed" : ""}`}>
+          <div
+            key={task._id}
+            className={`task ${task.status ? "completed" : ""}`}
+          >
             {editId === task._id ? (
               <div>
                 <input
@@ -309,7 +327,9 @@ function App() {
                 <input
                   type="number"
                   value={editPriority}
-                  onChange={(event) => handlePriorityChange(event.target.value, setEditPriority)}
+                  onChange={(event) =>
+                    handlePriorityChange(event.target.value, setEditPriority)
+                  }
                   placeholder="Edit Priority..."
                 />
                 <input
@@ -326,20 +346,28 @@ function App() {
                 <p>Description: {task.description}</p>
                 <p>Priority: {task.priority}</p>
                 <p>Category: {task.category}</p>
-                <p>Due Date: {new Date(task.dueDate).toLocaleDateString("en-US")}</p>
+                <p>
+                  Due Date: {new Date(task.dueDate).toLocaleDateString("en-US")}
+                </p>
 
                 <div className="task-actions">
-                  <button className="edit-button" onClick={() => {
-                    setEditId(task._id);
-                    setEditTitle(task.title);
-                    setEditCategory(task.category);
-                    setEditDescription(task.description);
-                    setEditPriority(task.priority);
-                    setEditDueDate(task.dueDate);
-                  }}>
+                  <button
+                    className="edit-button"
+                    onClick={() => {
+                      setEditId(task._id);
+                      setEditTitle(task.title);
+                      setEditCategory(task.category);
+                      setEditDescription(task.description);
+                      setEditPriority(task.priority);
+                      setEditDueDate(task.dueDate);
+                    }}
+                  >
                     Edit
                   </button>
-                  <button className="delete-button" onClick={() => deleteTask(task._id)}>
+                  <button
+                    className="delete-button"
+                    onClick={() => deleteTask(task._id)}
+                  >
                     Delete
                   </button>
                 </div>

@@ -77,15 +77,19 @@ app.post("/login", async (req, res) => {
 });
 
 // Secure routes
-app.get("/getTasks", protect, async (req, res) => {
+app.get("/getTasks/:category?", protect, async (req, res) => {
   try {
-    const tasks = await TaskModel.find({ user: req.user.id });
+    const { category } = req.params;
+    const query = category === "All" || !category ? { user: req.user.id } : { user: req.user.id, category };
+
+    const tasks = await TaskModel.find(query);
     res.json(tasks);
   } catch (err) {
     console.error("Error retrieving tasks:", err);
     res.status(500).json(err);
   }
 });
+
 
 app.post("/createTask", protect, async (req, res) => {
   try {
