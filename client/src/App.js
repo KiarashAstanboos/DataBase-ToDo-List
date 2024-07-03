@@ -1,6 +1,8 @@
-import "./App.css";
-import { useState, useEffect } from "react";
-import Axios from "axios";
+// src/App.js
+import React, { useState, useEffect } from 'react';
+import Axios from 'axios';
+import CalendarComponent from './CalendarComponent';
+import './App.css';
 
 function App() {
   const [listOfTasks, setListOfTasks] = useState([]);
@@ -282,34 +284,41 @@ function App() {
           <option value="Daily">Daily</option>
           <option value="Business">Business</option>
         </select>
+
         <input
           type="date"
-          placeholder="Due Date..."
           value={dueDate}
           onChange={(event) => setDueDate(event.target.value)}
         />
         <button onClick={createTask}>Create Task</button>
       </div>
 
-      <div className="progressBar">
-        <div className="progress" style={{ width: `${completionPercentage}%` }}>
-          {completionPercentage.toFixed(2)}%
-        </div>
-      </div>
-
-      <div className="tasksDisplay">
+      <div className="listOfTasks">
         {listOfTasks.map((task) => (
-          <div
-            key={task._id}
-            className={`task ${task.status ? "completed" : ""}`}
-          >
+          <div key={task._id} className="taskContainer">
             {editId === task._id ? (
-              <div>
+              <div className="editTask">
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(event) => setEditTitle(event.target.value)}
-                  placeholder="Edit Title..."
+                />
+                <input
+                  type="text"
+                  value={editDescription}
+                  onChange={(event) => setEditDescription(event.target.value)}
+                />
+                <input
+                  type="number"
+                  value={editPriority}
+                  onChange={(event) =>
+                    handlePriorityChange(event.target.value, setEditPriority)
+                  }
+                />
+                <input
+                  type="date"
+                  value={editDueDate}
+                  onChange={(event) => setEditDueDate(event.target.value)}
                 />
                 <select
                   value={editCategory}
@@ -318,72 +327,45 @@ function App() {
                   <option value="Daily">Daily</option>
                   <option value="Business">Business</option>
                 </select>
-                <input
-                  type="text"
-                  value={editDescription}
-                  onChange={(event) => setEditDescription(event.target.value)}
-                  placeholder="Edit Description..."
-                />
-                <input
-                  type="number"
-                  value={editPriority}
-                  onChange={(event) =>
-                    handlePriorityChange(event.target.value, setEditPriority)
-                  }
-                  placeholder="Edit Priority..."
-                />
-                <input
-                  type="date"
-                  value={editDueDate}
-                  onChange={(event) => setEditDueDate(event.target.value)}
-                  placeholder="Edit Due Date..."
-                />
                 <button onClick={() => editTask(task._id)}>Save</button>
+                <button onClick={() => setEditId(null)}>Cancel</button>
               </div>
             ) : (
-              <div>
-                <h1>Title: {task.title}</h1>
-                <p>Description: {task.description}</p>
+              <div className="task">
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
                 <p>Priority: {task.priority}</p>
+                <p>Status: {task.status ? "Completed" : "Pending"}</p>
+                <p>Due Date: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "N/A"}</p>
                 <p>Category: {task.category}</p>
-                <p>
-                  Due Date: {new Date(task.dueDate).toLocaleDateString("en-US")}
-                </p>
-
-                <div className="task-actions">
-                  <button
-                    className="edit-button"
-                    onClick={() => {
-                      setEditId(task._id);
-                      setEditTitle(task.title);
-                      setEditCategory(task.category);
-                      setEditDescription(task.description);
-                      setEditPriority(task.priority);
-                      setEditDueDate(task.dueDate);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="delete-button"
-                    onClick={() => deleteTask(task._id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-
-                <input
-                  type="checkbox"
-                  className="task-status-checkbox"
-                  checked={task.status}
-                  onChange={(event) => {
-                    updateTaskStatus(task._id, event.target.checked);
+                <button onClick={() => deleteTask(task._id)}>Delete</button>
+                <button onClick={() => updateTaskStatus(task._id, !task.status)}>
+                  {task.status ? "Mark as Pending" : "Mark as Completed"}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditId(task._id);
+                    setEditTitle(task.title);
+                    setEditDescription(task.description);
+                    setEditPriority(task.priority);
+                    setEditDueDate(task.dueDate ? new Date(task.dueDate).toISOString().substr(0, 10) : "");
+                    setEditCategory(task.category);
                   }}
-                />
+                >
+                  Edit
+                </button>
               </div>
             )}
           </div>
         ))}
+      </div>
+
+      <div className="completionPercentage">
+        <h3>Completion Percentage: {completionPercentage}%</h3>
+      </div>
+
+      <div>
+        <CalendarComponent token={token} />
       </div>
     </div>
   );
