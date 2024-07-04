@@ -29,6 +29,7 @@ const TaskSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: ["Business", "Daily"],
+    default: 'Daily' ,
     required: true,
   },
 });

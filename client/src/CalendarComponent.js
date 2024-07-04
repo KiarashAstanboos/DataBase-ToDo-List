@@ -1,40 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import Axios from 'axios';
+// src/CalendarComponent.js
+import React from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import './CalendarComponent.css'; // Add this line for custom styles
 
-const localizer = momentLocalizer(moment);
+const CalendarComponent = ({ tasks }) => {
+  const tileClassName = ({ date }) => {
+    const taskDates = tasks.map(task => new Date(task.dueDate).setHours(0, 0, 0, 0));
+    const currentDate = date.setHours(0, 0, 0, 0);
+    return taskDates.includes(currentDate) ? 'react-calendar__tile--active' : '';
+  };
 
-const CalendarComponent = ({ token }) => {
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    // Fetch tasks and transform them into calendar events
-    Axios.get('http://localhost:3001/getTasks/All', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((response) => {
-        const tasks = response.data.map((task) => ({
-          title: task.title,
-          start: new Date(task.dueDate),
-          end: new Date(task.dueDate),
-        }));
-        setEvents(tasks);
-      })
-      .catch((error) => {
-        console.error('Error fetching tasks:', error);
-      });
-  }, [token]);
+  const tileContent = ({ date }) => {
+    const taskDates = tasks.map(task => new Date(task.dueDate).setHours(0, 0, 0, 0));
+    const currentDate = date.setHours(0, 0, 0, 0);
+    return taskDates.includes(currentDate) ? '•' : null;
+  };
 
   return (
-    <div>
+    <div className="calendar-container">
       <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500 }}
+        tileClassName={tileClassName}
+        tileContent={tileContent}
       />
     </div>
   );

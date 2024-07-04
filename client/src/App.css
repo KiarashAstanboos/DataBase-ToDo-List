@@ -22,19 +22,17 @@ body {
 .task {
   background-color: #d3d3d3;
   padding: 20px;
-  border: 1px solid #ddd;
+  border: 2px solid #999;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  margin-bottom: 10px; /* Added margin to separate tasks */
 }
 
 .task.completed {
   background-color: #99a8bb;
   text-decoration: line-through;
 }
+
 
 .task h1 {
   font-size: 16px;
@@ -88,7 +86,9 @@ body {
 }
 
 .createTaskContainer input[type="text"],
-.createTaskContainer input[type="number"] {
+.createTaskContainer input[type="number"],
+.createTaskContainer input[type="date"],
+.createTaskContainer select {
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
@@ -133,7 +133,7 @@ header {
   margin: 0 5px;
 }
 
-sortButtons button:hover {
+.sortButtons button:hover {
   background-color: #3e8e41;
 }
 
@@ -165,6 +165,8 @@ sortButtons button:hover {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+
 .progressBar {
   background-color: #e0e0e0;
   border-radius: 10px;
@@ -180,4 +182,29 @@ sortButtons button:hover {
   color: white;
   line-height: 20px; /* same as height to center the text */
   transition: width 0.5s;
+}
+
+.calendar-task {
+  font-size: 10px;
+  word-wrap: break-word;
+}
+
+.react-calendar {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.react-calendar__tile--active {
+  background-color: #ffcccb !important; /* Change the highlight color here */
+  color: #000;
+}
+
+.react-calendar__tile--deadline {
+  background-color: #ff6347 !important; /* Change the deadline color here */
+  color: #fff;
+  border-radius: 50%;
 }
